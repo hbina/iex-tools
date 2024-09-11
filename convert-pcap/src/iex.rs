@@ -358,7 +358,7 @@ impl<'a> IexData<'a> {
         // println!("payload_length:{}", payload_length);
         // println!("stream_offset:{}", stream_offset);
         let i = &i[0..payload_length as usize + 40];
-        return IexData {
+        IexData {
             // eth_destination,
             // eth_source,
             // eth_type,
@@ -385,7 +385,7 @@ impl<'a> IexData<'a> {
             // send_ts,
             content: i,
             offset: 40,
-        };
+        }
     }
 
     pub fn next_message(&mut self) -> Option<Message<'_>> {
