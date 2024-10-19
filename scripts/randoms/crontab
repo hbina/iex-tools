@@ -1,0 +1,5 @@
+0 1 * * * flock /usr/share/zfs_pool/misc/rclone_lock -c "rclone copy google_drive_hanif: /usr/share/zfs_pool/remote/google_drive_hanif/" >> /usr/share/zfs_pool/misc/rclone_logs
+0 2 * * * flock /usr/share/zfs_pool/misc/rclone_lock -c "rclone copy google_drive_asadun: /usr/share/zfs_pool/remote/google_drive_asadun/" >> /usr/share/zfs_pool/misc/rclone_logs
+0 3 * * * flock /usr/share/zfs_pool/misc/rclone_lock -c "rclone copy google_photos_hanif: /usr/share/zfs_pool/remote/google_photos_hanif/" >> /usr/share/zfs_pool/misc/rclone_logs
+0 4 * * * flock /usr/share/zfs_pool/misc/rclone_lock -c "rclone copy google_photos_asadun: /usr/share/zfs_pool/remote/google_photos_asadun/" >> /usr/share/zfs_pool/misc/rclone_logs
+0 5 * * * flock /usr/share/zfs_pool/misc/rclone_lock -c "cd /usr/share/zfs_pool/remote && git status && git add . && git commit -s -m \"$(date)\"" >> /usr/share/zfs_pool/misc/rclone_logs
