@@ -6,23 +6,48 @@ from groundblock import GroundBlock
 
 
 def rclone_google_drive_hanif(dt_current: dt) -> str:
-    return f"rclone copy " f"google_drive_hanif: " f"/usr/share/zfs_pool/remote/google_drive_hanif/ " f"-vv "
+    return (
+        f"rclone copy "  #
+        f"google_drive_hanif: "  #
+        f"/usr/share/zfs_pool/remote/google_drive_hanif/ "  #
+        f"-vv "  #
+    )
 
 
 def rclone_google_drive_asadun(dt_current: dt) -> str:
-    return f"rclone copy " f"google_drive_asadun: " f"/usr/share/zfs_pool/remote/google_drive_asadun/ " f"-vv "
+    return (
+        f"rclone copy "  #
+        f"google_drive_asadun: "  #
+        f"/usr/share/zfs_pool/remote/google_drive_asadun/ "  #
+        f"-vv "  #
+    )
 
 
 def rclone_google_photos_hanif(dt_current: dt) -> str:
-    return f"rclone copy " f"google_photos_hanif: " f"/usr/share/zfs_pool/remote/google_photos_hanif/ " f"-vv "
+    return (
+        f"rclone copy "  #
+        f"google_photos_hanif: "  #
+        f"/usr/share/zfs_pool/remote/google_photos_hanif/ "  #
+        f"-vv "  #
+    )
 
 
 def rclone_google_photos_asadun(dt_current: dt) -> str:
-    return f"rclone copy " f"google_photos_asadun: " f"/usr/share/zfs_pool/remote/google_photos_asadun/ " f"-vv "
+    return (
+        f"rclone copy "  #
+        f"google_photos_asadun: "  #
+        f"/usr/share/zfs_pool/remote/google_photos_asadun/ "  #
+        f"-vv "  #
+    )
 
 
 def rclone_commit(dt_current: dt) -> str:
-    return f"cd /usr/share/zfs_pool/remote && " f"git status && " f"git add . && " f'git commit -s -m "commit {dt_current.isoformat()}"'
+    return (
+        f"cd /usr/share/zfs_pool/remote && "  #
+        f"git status && "  #
+        f"git add . && "  #
+        f'git commit -s -m "commit {dt_current.isoformat()}"'  #
+    )
 
 
 def run(db_path: str, dry_run: bool):
