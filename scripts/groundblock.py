@@ -34,11 +34,11 @@ class CronJob:
                         logging.info(f"{self.name} sleeping for {time_to_sleep} seconds from {dt_now} to {dt_next}")
                         time.sleep(time_to_sleep)
 
-            cmds = [c(dt_next) for c in self.commands]
-            group_id = cron_db.insert_commands(cmds)
+            cmds, group_id = cron_db.insert_commands([c(dt_next) for c in self.commands])
 
-            for cmd in cmds:
-                logging.info(f"running '{cmd}'")
+            for t in cmds:
+                cmd_id, cmd = t
+                logging.info(f"running cmd_id:{cmd_id} => '{cmd}'")
                 if not self.dry_run:
                     result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, shell=True)
 
@@ -46,7 +46,7 @@ class CronJob:
                     stdout_output = result.stdout
                     stderr_output = result.stderr
 
-                    cron_db.insert_log(cmd, result.returncode, stdout_output, stderr_output)
+                    cron_db.insert_log(cmd_id, cmd, result.returncode, stdout_output, stderr_output)
                     if result.returncode == 0:
                         cron_db.update_command_completed(cmd)
                     else:

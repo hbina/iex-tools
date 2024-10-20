@@ -3,15 +3,23 @@ import sqlite3
 
 from cron_db import CronDb
 
-
 app = Flask(__name__)
 
 
 @app.route("/")
 def index():
     cron_db = CronDb("/tmp/test.db")
-    commands = cron_db.select_commands()[:1024]
-    return render_template('index.html', commands=commands)
+    commands = cron_db.select_commands()
+    return render_template("index.html", commands=commands)
+
+
+@app.route("/logs/<string:command_id>")
+def log(command_id: str):
+    cron_db = CronDb("/tmp/test.db")
+    log_obj = cron_db.select_log(command_id)
+    if log_obj is None :
+        return render_template("cannot_find_log.html", command_id=command_id)
+    return render_template("log.html", log_obj=log_obj)
 
 
 def run_server():
