@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+{%- set command_id = log_obj.command_id -%}
+<head>
+    <meta charset="UTF-8">
+    <title>GroundBlock - Log - {{ command_id }}</title>
+</head>
+<body>
+<a href="/">Return</a>
+<h1>Command :: Log</h1>
+<table border="1">
+    <tr>
+        <th>Key</th>
+        <th>Value</th>
+    </tr>
+    <tr>
+        <td>Log Id</td>
+        <td>{{ log_obj.id_str }}</td>
+    </tr>
+    <tr>
+        <td>Command Id</td>
+        <td>{{ log_obj.command_id }}</td>
+    </tr>
+    <tr>
+        <td>Created At</td>
+        <td>{{ log_obj.created_at }}</td>
+    </tr>
+    <tr>
+        <td>Command</td>
+        <td>{{ log_obj.command }}</td>
+    </tr>
+    <tr>
+        <td>Return Code</td>
+        <td>{{ log_obj.return_code }}</td>
+    </tr>
+</table>
+<h1>
+    Stdout
+</h1>
+<div style="white-space:pre">
+    {{ log_obj.stdout }}
+</div>
+<h1>
+    Stderr
+</h1>
+<div style="white-space:pre; background-color:grey;">
+    {{ log_obj.stderr }}
+</div>
+</body>
+</html>

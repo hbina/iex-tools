@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>GroundBlock - Commands</title>
+</head>
+<body>
+<h1>Commands</h1>
+<table border="1">
+    <tr id="row-id-header">
+        <th>Id</th>
+        <th>Created At</th>
+        <th>Group Id</th>
+        <th>Order</th>
+        <th>Command Status</th>
+        <th>Group Status</th>
+        <th>Command</th>
+        <th>Log</th>
+    </tr>
+    <tr id="row-id-sort">
+        <td>
+            <button onclick="sortTable(0, 'asc')">asc</button>
+            <button onclick="sortTable(0, 'desc')">desc</button>
+        </td>
+        <td>
+            <button onclick="sortTable(1, 'asc')">asc</button>
+            <button onclick="sortTable(1, 'desc')">desc</button>
+        </td>
+        <td>
+            <button onclick="sortTable(2, 'asc')">asc</button>
+            <button onclick="sortTable(2, 'desc')">desc</button>
+        </td>
+        <td>
+            <button onclick="sortTable(3, 'asc')">asc</button>
+            <button onclick="sortTable(3, 'desc')">desc</button>
+        </td>
+        <td>
+            <button onclick="sortTable(4, 'asc')">asc</button>
+            <button onclick="sortTable(4, 'desc')">desc</button>
+        </td>
+        <td>
+            <button onclick="sortTable(5, 'asc')">asc</button>
+            <button onclick="sortTable(5, 'desc')">desc</button>
+        </td>
+        <td>
+            <button onclick="sortTable(6, 'asc')">asc</button>
+            <button onclick="sortTable(, 'desc')">desc</button>
+        </td>
+        <td>
+        </td>
+    </tr>
+    <tr id="row-id-filter">
+        <td><input type="text" id="filterId" placeholder="Id"></td>
+        <td><input type="text" id="filterCreatedAt" placeholder="Created At"></td>
+        <td><input type="text" id="filterGroupId" placeholder="Group Id"></td>
+        <td><input type="text" id="filterCommandOrder" placeholder="Order"></td>
+        <td><input type="text" id="filterCommandStatus" placeholder="Command Status"></td>
+        <td><input type="text" id="filterGroupStatus" placeholder="Group Status"></td>
+        <td><input type="text" id="filterCommand" placeholder="Command"></td>
+        <td></td>
+    </tr>
+    {% for command in commands %}
+    <tr id="row-id-data">
+        <td>{{ command.id_str }}</td>
+        <td>{{ command.created_at }}</td>
+        <td>{{ command.group_id }}</td>
+        <td>{{ command.command_order }}</td>
+        <td>{{ command.command_status.name }}</td>
+        <td>{{ command.group_status.name }}</td>
+        <td>{{ command.command }}</td>
+        {%- set string1 = "/logs/" -%}
+        {%- set string2 = command.id_str -%}
+        <td><a href="{{ string1 + string2 }}">Link</a></td>
+    </tr>
+    {% endfor %}
+</table>
+
+<script>
+    // Get all filter input elements
+    const filters = {
+        Id: document.getElementById('filterId'),
+        CreatedAt: document.getElementById('filterCreatedAt'),
+        GroupId: document.getElementById('filterGroupId'),
+        CommandOrder: document.getElementById('filterCommandOrder'),
+        CommandStatus: document.getElementById('filterCommandStatus'),
+        GroupStatus: document.getElementById('filterGroupStatus'),
+        Command: document.getElementById('filterCommand')
+    };
+
+    // Add event listeners to each input field for filtering
+    Object.keys(filters).forEach(key => {
+        filters[key].addEventListener('input', filterTable);
+    });
+
+    function filterTable() {
+        const rows = document.querySelectorAll('tr#row-id-data');
+
+        rows.forEach(row => {
+            let showRow = true;
+
+            Object.keys(filters).forEach((key, index) => {
+                const filterValue = filters[key].value.toLowerCase();
+                const cellValue = row.cells[index].textContent.toLowerCase();
+
+                if (filterValue && !cellValue.includes(filterValue)) {
+                    showRow = false;
+                }
+            });
+
+            row.style.display = showRow ? '' : 'none';
+        });
+    }
+
+    // Sort table function
+    let sortDirection = {};
+
+    function sortTable(columnIndex, direction) {
+        const table = document.querySelector('tbody');
+        const rows = Array.from(table.querySelectorAll('tr#row-id-data'));
+
+<!--        const direction = sortDirection[columnIndex] === 'asc' ? 'desc' : 'asc';-->
+        sortDirection[columnIndex] = direction;
+
+        rows.sort((a, b) => {
+            const cellA = a.cells[columnIndex].textContent.trim().toLowerCase();
+            const cellB = b.cells[columnIndex].textContent.trim().toLowerCase();
+
+            if (!isNaN(cellA) && !isNaN(cellB)) {
+                // If the cells contain numbers, compare them as numbers
+                return direction === 'asc' ? cellA - cellB : cellB - cellA;
+            } else {
+                // Otherwise, compare as strings
+                return direction === 'asc'
+                    ? cellA.localeCompare(cellB)
+                    : cellB.localeCompare(cellA);
+            }
+        });
+
+        rows.forEach(row => table.appendChild(row)); // Append sorted rows back to the table
+    }
+</script>
+
+</body>
+</html>
