@@ -63,6 +63,17 @@ def run(db_path: str, dry_run: bool):
             rclone_commit,  #
         ],
     )
+    ground_block.add(
+        "Process Pcap Data",
+        "0 0 * * *",
+        [
+            rclone_google_drive_hanif,  #
+            rclone_google_drive_asadun,  #
+            rclone_google_photos_hanif,  #
+            rclone_google_photos_asadun,  #
+            rclone_commit,  #
+        ],
+    )
     ground_block.run()
 
 
