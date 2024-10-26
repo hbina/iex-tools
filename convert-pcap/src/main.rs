@@ -64,7 +64,7 @@ fn run_loop(input_path: &str, output_path: &str) {
     let mut file_map: HashMap<String, std::io::BufWriter<std::fs::File>> =
         HashMap::with_capacity(100_000);
     let file = File::open(input_path).unwrap();
-    let file = GzDecoder::new(file);
+    let file = zstd::Decoder::new(file).unwrap();
     let mut reader = PcapNGReader::new(65536, file).unwrap();
     let mut global_counter = 0;
 
