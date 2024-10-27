@@ -3,7 +3,7 @@ import numpy as np
 import tables
 import argparse
 
-from scripts.dtypes import trade_report_message_dtype, quote_update_message_dtype
+from dtypes import trade_report_message_dtype, quote_update_message_dtype
 
 
 def get_dtype_from_filename(filename: str):
