@@ -1,0 +1,34 @@
+type: struct
+name: AuctionInformationMessage
+member:
+  - name: message_type
+    type: <u1
+  - name: auction_type
+    type: <u1
+  - name: timestamp
+    type: <i8
+  - name: symbol
+    type: <u1
+    length: 8
+  - name: paired_shares
+    type: <u4
+  - name: reference_price
+    type: <i8
+  - name: indicative_clearing_price
+    type: <i8
+  - name: imbalance_shares
+    type: <u4
+  - name: imbalance_side
+    type: <u1
+  - name: extension_number
+    type: <u1
+  - name: scheduled_auction_time
+    type: <u4
+  - name: auction_book_clearing_price
+    type: <i8
+  - name: collar_reference_price
+    type: <i8
+  - name: lower_auction_collar
+    type: <i8
+  - name: upper_auction_collar
+    type: <i8

@@ -26,7 +26,7 @@ def download(link: str, link_name: str, output_path: str):
     if os.path.exists(pcap_path) and os.path.getsize(pcap_path) < 512 * 1024 * 1024:
         logging.info(f"Already exists, skipping {pcap_path}")
         return False, link
-
+ 
     cmd = f'wget "{link}" -O {pcap_path} --no-verbose'
     logging.info(cmd)
     subprocess.run(cmd, shell=True, stdout=open(os.devnull, "w"), stderr=open(os.devnull, "w"))

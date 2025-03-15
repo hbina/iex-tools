@@ -1,0 +1,7 @@
+type: struct
+name: PcapngHeader
+member:
+  - name: block_type
+    type: <u4
+  - name: block_total_length
+    type: <u4

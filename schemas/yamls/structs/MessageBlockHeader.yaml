@@ -1,0 +1,5 @@
+type: struct
+name: MessageBlockHeader
+member:
+  - name: message_length
+    type: <u2

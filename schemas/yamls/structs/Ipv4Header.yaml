@@ -1,0 +1,25 @@
+type: struct
+name: Ipv4Header
+member:
+  - name: version_ihl
+    type: <u1
+  - name: tos
+    type: <u1
+  - name: total_length
+    type: <u2
+  - name: identification
+    type: <u2
+  - name: flags_fragment_offset
+    type: <u2
+  - name: ttl
+    type: <u1
+  - name: protocol
+    type: <u1
+  - name: header_checksum
+    type: <u2
+  - name: source_ip
+    type: <u1
+    length: 4
+  - name: destination_ip
+    type: <u1
+    length: 4

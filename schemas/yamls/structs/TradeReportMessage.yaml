@@ -1,0 +1,18 @@
+type: struct
+name: TradeReportMessage
+member:
+  - name: message_type
+    type: <u1
+  - name: sale_condition_flags
+    type: <u1
+  - name: timestamp
+    type: <i8
+  - name: symbol
+    type: <u1
+    length: 8
+  - name: size
+    type: <u4
+  - name: price
+    type: <i8
+  - name: trade_id
+    type: <i8

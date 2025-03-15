@@ -1,0 +1,23 @@
+type: struct
+name: TransportProtocolHeader
+member:
+  - name: version
+    type: <u1
+  - name: reserved
+    type: <u1
+  - name: message_protocol_id
+    type: <u2
+  - name: channel_id
+    type: <u4
+  - name: session_id
+    type: <u4
+  - name: payload_length
+    type: <u2
+  - name: message_count
+    type: <u2
+  - name: stream_offset
+    type: <i8
+  - name: first_message_sequence_number
+    type: <i8
+  - name: send_time
+    type: <i8

@@ -17,7 +17,7 @@ def index():
 def log(command_id: str):
     cron_db = CronDb("/tmp/test.db")
     log_obj = cron_db.select_log(command_id)
-    if log_obj is None :
+    if log_obj is None:
         return render_template("cannot_find_log.html", command_id=command_id)
     return render_template("log.html", log_obj=log_obj)
 

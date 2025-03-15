@@ -1,0 +1,11 @@
+type: struct
+name: EthernetIIHeader
+member:
+  - name: destination_mac
+    type: <u1
+    length: 6
+  - name: source_mac
+    type: <u1
+    length: 6
+  - name: ethertype
+    type: <u2

@@ -1,0 +1,15 @@
+type: struct
+name: ShortSalePriceTestStatusMessage
+member:
+  - name: message_type
+    type: <u1
+  - name: short_sale_price_test_status
+    type: <u1
+  - name: timestamp
+    type: <i8
+  - name: symbol
+    type: <u1
+    length: 8
+  - name: detail
+    type: <u1
+    length: 1

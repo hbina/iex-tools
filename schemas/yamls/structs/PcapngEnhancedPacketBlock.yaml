@@ -1,0 +1,13 @@
+type: struct
+name: PcapngEnhancedPacketBlock
+member:
+  - name: interface_id
+    type: <u4
+  - name: timestamp_upper
+    type: <u4
+  - name: timestamp_lower
+    type: <u4
+  - name: captured_packet_length
+    type: <u4
+  - name: original_packet_length
+    type: <u4

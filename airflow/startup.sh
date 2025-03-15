@@ -1,4 +1,12 @@
-#!/usr/bin/bash
+#!/usr/bin/fish
 
-nohup airflow webserver --port 8080 > /usr/share/zfs_pool/airflow/webserver.log &
-nohup airflow scheduler > /usr/share/zfs_pool/airflow/schedular.log &
+# set -x
+echo "Killing airflow processes..."
+sudo pkill -f airflow
+sleep 5
+echo "Listing airflow processes, it should be empty..."
+pgrep -af airflow
+echo "Starting the processes back up..."
+nohup airflow webserver --port 8080 > webserver.log &
+sleep 1
+nohup airflow scheduler > scheduler.log &

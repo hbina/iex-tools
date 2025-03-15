@@ -5,7 +5,6 @@ import sys
 def run(source_folder: str):
     assert os.path.exists(source_folder)
     assert os.path.isdir(source_folder)
-    
 
     print(f"processing {source_folder}")
     # Iterate through all files in the folder

@@ -23,14 +23,14 @@ class GroupStatus(enum.Enum):
 
 class RowCommand:
     def __init__(
-            self,
-            id_str: str,
-            created_at: str,
-            group_id: str,
-            command_order: int,
-            command: str,
-            command_status: CommandStatus,
-            group_status: GroupStatus,
+        self,
+        id_str: str,
+        created_at: str,
+        group_id: str,
+        command_order: int,
+        command: str,
+        command_status: CommandStatus,
+        group_status: GroupStatus,
     ):
         self.id_str = id_str
         self.created_at = created_at
@@ -43,14 +43,14 @@ class RowCommand:
 
 class RowLog:
     def __init__(
-            self,
-            id_str: str,
-            command_id: str,
-            created_at: str,
-            command: str,
-            return_code: int,
-            stdout: str,
-            stderr: str,
+        self,
+        id_str: str,
+        command_id: str,
+        created_at: str,
+        command: str,
+        return_code: int,
+        stdout: str,
+        stderr: str,
     ):
         self.id_str = id_str
         self.command_id = command_id
@@ -63,10 +63,10 @@ class RowLog:
 
 class RowCommandGroup:
     def __init__(
-            self,
-            id_str: str,
-            created_at: str,
-            group_status: CommandStatus,
+        self,
+        id_str: str,
+        created_at: str,
+        group_status: CommandStatus,
     ):
         self.id_str = id_str
         self.created_at = created_at

@@ -1,0 +1,9 @@
+type: struct
+name: PcapngInterfaceDescriptionBlock
+member:
+  - name: linktype
+    type: <u2
+  - name: reserved
+    type: <u2
+  - name: snaplen
+    type: <u4

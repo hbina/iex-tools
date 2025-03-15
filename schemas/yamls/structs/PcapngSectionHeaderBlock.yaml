@@ -1,0 +1,11 @@
+type: struct
+name: PcapngSectionHeaderBlock
+member:
+  - name: byte_order_magic
+    type: <u4
+  - name: major_version
+    type: <u2
+  - name: minor_version
+    type: <u2
+  - name: section_length
+    type: <i8

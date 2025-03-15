@@ -1,11 +1,14 @@
+use crate::iex::{IexGenerator, IexMessage};
+use crate::pcap_parser::{PcapData, PcapParser};
 use clap::Parser;
-use flate2::read::GzDecoder;
-use pcap_parser::{traits::PcapReaderIterator, PcapError, PcapNGReader};
+use memmap2::Mmap;
+use std::fs::{create_dir_all, OpenOptions};
+use std::io::{BufWriter, Read};
 use std::{collections::HashMap, fs::File, io::Write};
 
-use crate::iex::IexData;
-
 mod iex;
+mod pcap_parser;
+mod structs;
 
 /// Simple program to greet a person
 #[derive(Parser, Debug)]
@@ -18,23 +21,23 @@ struct Args {
     output_path: String,
 }
 
-fn print_options(options: &[pcap_parser::PcapNGOption]) {
-    for option in options {
-        if option.code == pcap_parser::OptionCode::Comment {
-            let strr = std::str::from_utf8(&option.value).unwrap();
-            println!("comment:\n{}", strr);
-        } else if option.code == pcap_parser::OptionCode::ShbHardware {
-            let strr = std::str::from_utf8(&option.value).unwrap();
-            println!("hardware:\n{}", strr);
-        } else if option.code == pcap_parser::OptionCode::ShbUserAppl {
-            let strr = std::str::from_utf8(&option.value).unwrap();
-            println!("user application:\n{}", strr);
-        }
-    }
-}
+// fn print_options(options: &[PcapNGOption]) {
+//     for option in options {
+//         if option.code == OptionCode::Comment {
+//             let strr = std::str::from_utf8(&option.value).unwrap();
+//             println!("comment:\n{}", strr);
+//         } else if option.code == OptionCode::ShbHardware {
+//             let strr = std::str::from_utf8(&option.value).unwrap();
+//             println!("hardware:\n{}", strr);
+//         } else if option.code == OptionCode::ShbUserAppl {
+//             let strr = std::str::from_utf8(&option.value).unwrap();
+//             println!("user application:\n{}", strr);
+//         }
+//     }
+// }
 
 fn write_to_file(
-    zstd_map: &mut HashMap<String, std::io::BufWriter<std::fs::File>>,
+    zstd_map: &mut HashMap<String, BufWriter<File>>,
     counter: u64,
     symbol: &str,
     symbol_u64: u64,
@@ -47,97 +50,107 @@ fn write_to_file(
     let file_path_str = file_path.to_str().unwrap().to_owned();
     if !zstd_map.contains_key(&file_path_str) {
         println!("file_map:{} {} {}", zstd_map.len(), counter, file_path_str);
-        std::fs::create_dir_all(file_path.parent().unwrap()).unwrap();
+        create_dir_all(file_path.parent().unwrap()).unwrap();
     }
-    let writer = zstd_map.entry(file_path_str.clone()).or_insert(std::io::BufWriter::new(
-        std::fs::OpenOptions::new()
-            .write(true)
-            .append(true)
-            .create(true)
-            .open(file_path_str)
-            .unwrap(),
+    let writer = zstd_map.entry(file_path_str.clone()).or_insert(BufWriter::new(
+        OpenOptions::new().write(true).append(true).create(true).open(file_path_str).unwrap(),
     ));
     let _ = writer.write_all(buffer).unwrap();
 }
 
 fn run_loop(input_path: &str, output_path: &str) {
-    let mut file_map: HashMap<String, std::io::BufWriter<std::fs::File>> =
-        HashMap::with_capacity(100_000);
-    let file = File::open(input_path).unwrap();
-    let file = zstd::Decoder::new(file).unwrap();
-    let mut reader = PcapNGReader::new(65536, file).unwrap();
-    let mut global_counter = 0;
+    let mut input_file = File::open(input_path).unwrap();
+    // let mut buffer = vec![0; 100 * 1024 * 1024];
+    // input_file.read_to_end(&mut buffer).unwrap();
+    let buffer = unsafe { Mmap::map(&input_file).unwrap() };
+    let pcap_parser = PcapParser::new(&buffer);
+    let mut pcap_count = 0;
+    let mut message_count = 0;
+    for (pcap_idx, pcap_data) in pcap_parser.enumerate() {
+        pcap_count += 1;
+        match pcap_data {
+            PcapData::EnhancedPacketBlock(
+                pcapng_header,
+                pcapng_enhanced_packet_block,
+                packet_buffer,
+                options,
+            ) => {
+                // println!("pcap_idx:{}", pcap_idx);
+                // println!("{:?}", pcapng_header);
+                // println!("{:?}", pcapng_enhanced_packet_block);
+                // println!("{:?}", packet_buffer);
+                // println!("{:?}", options);
 
-    loop {
-        match reader.next() {
-            Ok((offset, block)) => {
-                // println!("---------------------------------");
-                match block {
-                    pcap_parser::PcapBlockOwned::NG(ng) => match ng {
-                        pcap_parser::Block::SectionHeader(shb) => {}
-                        pcap_parser::Block::InterfaceDescription(idb) => {
-                            print_options(&idb.options);
-                        }
-                        pcap_parser::Block::EnhancedPacket(epb) => {
-                            let mut ok = IexData::parse(epb.data);
-                            let mut local_counter = 0;
-                            while let Some(msg) = &ok.next_message() {
-                                // println!("-----------------------------------");
-                                // println!("local_counter:{}", local_counter);
-                                local_counter += 1;
-                                match msg {
-                                    iex::Message::TradingMsg(a) => match a {
-                                        iex::TradingMsg::TradeReportMessage(t) => {
-                                            let symbol = t.symbol();
-                                            let symbol_u64 = t.symbol_as_u64();
-                                            // println!("symbol:{}", symbol);
-
-                                            write_to_file(
-                                                &mut file_map,
-                                                global_counter,
-                                                symbol,
-                                                symbol_u64,
-                                                &output_path,
-                                                &t.0,
-                                                "trade_report_message",
-                                            );
-                                        }
-                                        iex::TradingMsg::QuoteUpdateMessage(q) => {
-                                            let symbol = q.symbol();
-                                            let symbol_u64 = q.symbol_as_u64();
-                                            // println!("symbol:{}", symbol);
-
-                                            write_to_file(
-                                                &mut file_map,
-                                                global_counter,
-                                                symbol,
-                                                symbol_u64,
-                                                &output_path,
-                                                &q.0,
-                                                "quote_update_message",
-                                            );
-                                        }
-                                        _ => {}
-                                    },
-                                    _ => {}
-                                }
-                                global_counter += 1;
-                            }
-                        }
-                        _ => todo!(),
-                    },
-                    _ => todo!(),
+                let iex_generator = IexGenerator::new(packet_buffer).unwrap();
+                for (message_idx, message) in iex_generator.enumerate() {
+                    // println!("message_idx:{}", message_idx);
+                    // match message {
+                    //     IexMessage::AdminMessage(msg) => println!("{:#?}", msg),
+                    //     IexMessage::TradingMessage(msg) => {
+                    //         println!("{:#?}", msg)
+                    //     }
+                    //     IexMessage::AuctionMessage(msg) => {
+                    //         println!("{:#?}", msg)
+                    //     }
+                    // }
+                    message_count += 1;
                 }
+            }
+        }
 
-                reader.consume(offset);
-            }
-            Err(PcapError::Eof) => break,
-            Err(PcapError::Incomplete(_)) => {
-                reader.refill().unwrap();
-            }
-            Err(e) => panic!("error while reading: {:?}", e),
+        if (pcap_count % 1_000_000 == 0) {
+            println!("pcap_count:{} message_count:{}", pcap_count, message_count);
         }
     }
+    println!("pcap_count:{} message_count:{}", pcap_count, message_count);
+
+    // let mut file_map: HashMap<String, BufWriter<File>> = HashMap::with_capacity(100_000);
+    // // let file = zstd::Decoder::new(file).unwrap();
+    // let mut global_counter = 0;
+    //
+    // let iex_gen = IexGenerator::new(input_path);
+    //
+    // for msg in iex_gen {
+    //     match msg {
+    //         iex::Message::TradingMsg(a) => match a {
+    //             iex::TradingMsg::TradeReportMessage(t) => {
+    //                 let symbol = t.symbol();
+    //                 let symbol_u64 = t.symbol_as_u64();
+    //                 // println!("symbol:{}", symbol);
+    //
+    //                 write_to_file(
+    //                     &mut file_map,
+    //                     global_counter,
+    //                     symbol,
+    //                     symbol_u64,
+    //                     &output_path,
+    //                     &t.0,
+    //                     "trade_report_message",
+    //                 );
+    //             }
+    //             iex::TradingMsg::QuoteUpdateMessage(q) => {
+    //                 let symbol = q.symbol();
+    //                 let symbol_u64 = q.symbol_as_u64();
+    //                 // println!("symbol:{}", symbol);
+    //
+    //                 write_to_file(
+    //                     &mut file_map,
+    //                     global_counter,
+    //                     symbol,
+    //                     symbol_u64,
+    //                     &output_path,
+    //                     &q.0,
+    //                     "quote_update_message",
+    //                 );
+    //             }
+    //             iex::TradingMsg::OfficialPriceMessage(official_price_msg) => {}
+    //             iex::TradingMsg::TradeBreakMsg(trade_break_msg) => {}
+    //         },
+    //         iex::Message::AdminMsg(admnin_msg) => {}
+    //         iex::Message::AuctionMsg(auction_message) => {}
+    //     }
+    //     global_counter += 1;
+    // }
 }
 
 fn main() {

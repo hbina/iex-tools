@@ -1,0 +1,11 @@
+type: struct
+name: UdpHeader
+member:
+  - name: source_port
+    type: <u2
+  - name: destination_port
+    type: <u2
+  - name: length
+    type: <u2
+  - name: checksum
+    type: <u2
